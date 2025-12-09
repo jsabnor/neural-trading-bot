@@ -16,9 +16,7 @@ kill_process() {
     fi
 }
 
-kill_process "pid_btc.txt"
-kill_process "pid_eth.txt"
-kill_process "pid_sol.txt"
+kill_process "pid_neural_multi.txt"
 kill_process "pid_telegram.txt"
 
 # Limpieza adicional por si acaso (opcional, cuidado si hay otros python corriendo)
