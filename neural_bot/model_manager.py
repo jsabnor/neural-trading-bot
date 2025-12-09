@@ -142,16 +142,28 @@ class ModelManager:
                 return None
             print(f"📂 Cargando modelo por defecto: {name}")
         
-        # Verificar que existe
+        # Verificar que existe en el índice
         if name not in self.index['models']:
-            print(f"❌ Modelo '{name}' no encontrado")
-            return None
-        
-        model_path = Path(self.index['models'][name]['path'])
+            # FALLBACK: Verificar si existe el directorio directamente
+            # Esto es útil cuando se suben modelos manualmente (SCP/FTP) sin actualizar el índice
+            direct_path = self.models_dir / name
+            if direct_path.exists() and (direct_path / 'model.keras').exists():
+                print(f"⚠️ Modelo '{name}' no está en el índice, pero existe en disco. Intentando cargar...")
+                model_path = direct_path
+            else:
+                print(f"❌ Modelo '{name}' no encontrado en índice ni en disco")
+                return None
+        else:
+            model_path = Path(self.index['models'][name]['path'])
         
         if not model_path.exists():
-            print(f"❌ Directorio del modelo no existe: {model_path}")
-            return None
+            # Intentar ruta relativa si la absoluta falla (por cambio de OS Windows -> Linux)
+            relative_path = self.models_dir / model_path.name
+            if relative_path.exists():
+                model_path = relative_path
+            else:
+                print(f"❌ Directorio del modelo no existe: {model_path}")
+                return None
         
         try:
             # Cargar modelo

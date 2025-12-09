@@ -88,7 +88,25 @@ TIMEFRAME=4h
 
 ---
 
-## 5. Verificar Instalación
+## 5. Subir Modelos Entrenados
+
+El error "Directorio del modelo no existe" ocurre porque los modelos entrenados en tu PC no están en el VPS. Debes subirlos.
+
+Desde tu **PC LOCAL** (PowerShell o Terminal), ejecuta:
+
+```bash
+# Subir el modelo BTC_4h_v8 (reemplaza usuario@ip_vps)
+scp -r models/BTC_4h_v8 usuario@ip_vps:~/bots/neural-trading-bot/models/
+```
+
+O si usas **FileZilla**:
+1. Conéctate a tu VPS por SFTP.
+2. Navega a `~/bots/neural-trading-bot/models/`.
+3. Sube la carpeta `BTC_4h_v8` desde tu PC.
+
+---
+
+## 6. Verificar Instalación
 
 ```bash
 # Verificar que los modelos existen
