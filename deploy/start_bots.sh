@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Detectar Python
-PYTHON_CMD="python"
+PYTHON_CMD="python3"
 if [ -d "venv" ]; then
     source venv/bin/activate
     # Asegurar que usamos el python del venv
     if [ -f "venv/bin/python" ]; then
         PYTHON_CMD="venv/bin/python"
     fi
-elif command -v python3 &> /dev/null; then
-    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
 fi
 
 echo "🚀 Iniciando Bots Neuronales..."
