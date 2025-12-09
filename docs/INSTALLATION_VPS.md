@@ -146,42 +146,51 @@ python telegram_bot_handler.py
 
 ---
 
-## 7. Configurar Servicio Systemd (Opcional - Auto-inicio)
+## 7. Configurar Servicio (Systemd)
 
-### Crear archivo de servicio:
+Para que el bot se ejecute automáticamente al reiniciar el VPS y se recupere de fallos, configuramos un servicio.
 
-```bash
-sudo nano /etc/systemd/system/neural-bot.service
-```
+1. **Editar el archivo de servicio:**
+   
+   El archivo `deploy/neural-bot.service` ya tiene una plantilla. Edítalo para asegurar que el usuario y rutas sean correctos:
 
-### Contenido:
+   ```bash
+   nano deploy/neural-bot.service
+   ```
+   
+   *Verifica que `User=j0s3m4` y las rutas `/home/j0s3m4/...` coincidan con tu usuario real.*
 
-```ini
-[Unit]
-Description=Neural Trading Bot
-After=network.target
+2. **Instalar el servicio:**
 
-[Service]
-Type=simple
-User=tu_usuario
-WorkingDirectory=/home/tu_usuario/bots/neural-trading-bot
-Environment=PATH=/home/tu_usuario/bots/neural-trading-bot/venv/bin
-ExecStart=/home/tu_usuario/bots/neural-trading-bot/venv/bin/python bot_neural.py --mode paper --model BTC_4h_v8 --id MULTI --symbols "ETH/USDT,SOL/USDT,DOGE/USDT"
-Restart=always
-RestartSec=10
+   ```bash
+   # Copiar al directorio de systemd
+   sudo cp deploy/neural-bot.service /etc/systemd/system/
 
-[Install]
-WantedBy=multi-user.target
-```
+   # Recargar daemon
+   sudo systemctl daemon-reload
 
-### Habilitar servicio:
+   # Habilitar inicio automático
+   sudo systemctl enable neural-bot
 
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable neural-bot
-sudo systemctl start neural-bot
-sudo systemctl status neural-bot
-```
+   # Iniciar servicio
+   sudo systemctl start neural-bot
+   ```
+
+3. **Verificar estado:**
+
+   ```bash
+   sudo systemctl status neural-bot
+   ```
+
+4. **Ver logs:**
+
+   ```bash
+   # Logs del servicio
+   journalctl -u neural-bot -f
+
+   # Logs de los bots (en la carpeta del proyecto)
+   tail -f log_neural_multi.txt
+   ```
 
 ---
 

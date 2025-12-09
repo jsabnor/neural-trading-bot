@@ -1,0 +1,27 @@
+[Unit]
+Description=Neural Trading Bot Service
+After=network.target
+
+[Service]
+# ⚠️ IMPORTANTE: Reemplaza 'j0s3m4' con tu usuario real de Linux
+User=j0s3m4
+Group=j0s3m4
+
+# Directorio de trabajo
+WorkingDirectory=/home/j0s3m4/bots/neural-trading-bot
+
+# Variables de entorno
+Environment="PATH=/home/j0s3m4/bots/neural-trading-bot/venv/bin:/usr/bin"
+
+# Comando de inicio
+# Usamos Type=forking porque start_bots.sh lanza procesos en background
+Type=forking
+ExecStart=/home/j0s3m4/bots/neural-trading-bot/deploy/start_bots.sh
+ExecStop=/home/j0s3m4/bots/neural-trading-bot/deploy/stop_bots.sh
+
+# Reinicio automático
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
