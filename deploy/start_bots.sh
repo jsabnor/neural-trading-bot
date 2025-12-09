@@ -1,15 +1,14 @@
 #!/bin/bash
 
-# Detectar Python
-PYTHON_CMD="python3"
-if [ -d "venv" ]; then
-    source venv/bin/activate
-    # Asegurar que usamos el python del venv
-    if [ -f "venv/bin/python" ]; then
-        PYTHON_CMD="venv/bin/python"
-    fi
-elif command -v python &> /dev/null; then
-    PYTHON_CMD="python"
+# Usar directamente el python del entorno virtual
+# Esto es más seguro que confiar en 'source activate' o en el PATH del sistema
+PYTHON_CMD="venv/bin/python"
+
+# Verificar que existe
+if [ ! -f "$PYTHON_CMD" ]; then
+    echo "❌ Error: No se encuentra $PYTHON_CMD"
+    echo "   Asegúrate de haber creado el entorno virtual: python3 -m venv venv"
+    exit 1
 fi
 
 echo "🚀 Iniciando Bots Neuronales..."
