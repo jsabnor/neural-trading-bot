@@ -1,7 +1,14 @@
 #!/bin/bash
 
+# Asegurar que estamos en el directorio raíz del proyecto
+# Obtener el directorio donde está este script (deploy/) y subir un nivel
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
+
+echo "📂 Directorio de trabajo: $(pwd)"
+
 # Usar directamente el python del entorno virtual
-# Esto es más seguro que confiar en 'source activate' o en el PATH del sistema
 PYTHON_CMD="venv/bin/python"
 
 # Verificar que existe

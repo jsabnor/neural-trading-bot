@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Asegurar que estamos en el directorio raíz del proyecto
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
+
 echo "🛑 Deteniendo servicios..."
 
 # Función para matar proceso por archivo PID
@@ -13,6 +18,8 @@ kill_process() {
             echo "   - Proceso $pid no encontrado ($1)"
         fi
         rm "$1"
+    else
+        echo "   ℹ️ No se encontró archivo PID: $1"
     fi
 }
 
