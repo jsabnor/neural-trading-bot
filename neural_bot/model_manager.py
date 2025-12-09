@@ -157,13 +157,24 @@ class ModelManager:
             model_path = Path(self.index['models'][name]['path'])
         
         if not model_path.exists():
-            # Intentar ruta relativa si la absoluta falla (por cambio de OS Windows -> Linux)
-            relative_path = self.models_dir / model_path.name
-            if relative_path.exists():
-                model_path = relative_path
+            # ESTRATEGIA ROBUSTA CROSS-PLATFORM
+            # 1. Intentar construir ruta directamente con el nombre del modelo
+            # Esto ignora la ruta guardada (que puede ser de Windows) y usa la estructura local
+            direct_path_from_name = self.models_dir / name
+            
+            if direct_path_from_name.exists():
+                print(f"⚠️ Ruta índice inválida. Usando ruta local: {direct_path_from_name}")
+                model_path = direct_path_from_name
             else:
-                print(f"❌ Directorio del modelo no existe: {model_path}")
-                return None
+                # 2. Intentar ruta relativa usando el nombre del path guardado (fallback legacy)
+                # Nota: Esto puede fallar si model_path tiene backslashes en Linux
+                relative_path = self.models_dir / model_path.name
+                if relative_path.exists():
+                    model_path = relative_path
+                else:
+                    print(f"❌ Directorio del modelo no existe: {model_path}")
+                    print(f"   Tampoco se encontró en: {direct_path_from_name}")
+                    return None
         
         try:
             # Cargar modelo
