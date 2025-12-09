@@ -1,0 +1,18 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+*.egg-info/
+
+# Data & Logs
+*.log
+log_*.txt
+pid_*.txt
+
+
+# Models (descomentar si NO quieres subirlos a Git)
+# models/*.keras
+# models/*.pkl

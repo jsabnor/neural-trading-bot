@@ -1,0 +1,20 @@
+{
+  "symbols": [
+    "ETH/USDT",
+    "BTC/USDT",
+    "SOL/USDT",
+    "XRP/USDT",
+    "ADA/USDT",
+    "DOGE/USDT",
+    "LINK/USDT",
+    "BNB/USDT"
+  ],
+  "timeframe": "4h",
+  "start_date": "all",
+  "end_date": "present",
+  "description": "Model trained on ['ETH/USDT', 'BTC/USDT', 'SOL/USDT', 'XRP/USDT', 'ADA/USDT', 'DOGE/USDT', 'LINK/USDT', 'BNB/USDT']",
+  "name": "BTC_4h_v6",
+  "saved_at": "2025-12-05T12:10:51.033277",
+  "model_file": "models\\BTC_4h_v6\\model.keras",
+  "scaler_file": "models\\BTC_4h_v6\\scaler.pkl"
+}

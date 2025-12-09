@@ -1,0 +1,2 @@
+timestamp,symbol,type,reason,entry_price,exit_price,qty,pnl,pnl_percent,duration
+2025-12-09T01:03:38.771430,XRP/USDT,SELL,NEURAL_SELL,2.0886,2.0727,23.4,-0.3720599999999905,-0.7612754955472372,N/A

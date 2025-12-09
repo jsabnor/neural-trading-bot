@@ -1,0 +1,13 @@
+{
+  "symbols": [
+    "BTC/USDT"
+  ],
+  "timeframe": "1h",
+  "start_date": "2015-01-01",
+  "end_date": "2024-12-31",
+  "description": "Model trained on ['BTC/USDT']",
+  "name": "BTC_1h_v4",
+  "saved_at": "2025-12-03T20:28:25.588934",
+  "model_file": "models\\BTC_1h_v4\\model.keras",
+  "scaler_file": "models\\BTC_1h_v4\\scaler.pkl"
+}

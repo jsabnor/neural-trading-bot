@@ -1,0 +1,20 @@
+{
+  "symbols": [
+    "SOL/USDT",
+    "ETH/USDT",
+    "XRP/USDT",
+    "SOL/EUR",
+    "ETH/EUR",
+    "BTC/USDT",
+    "BTC/EUR",
+    "DOGE/USDT",
+    "DOGE/EUR"
+  ],
+  "timeframe": "1h",
+  "description": "Model trained on SOL/USDT, ETH/USDT, XRP/USDT, SOL/EUR, ETH/EUR, BTC/USDT, BTC/EUR, DOGE/USDT, DOGE/EUR",
+  "accuracy": null,
+  "name": "GENERAL_GROUP_1h_v2",
+  "saved_at": "2025-12-03T13:43:19.266097",
+  "model_file": "models\\GENERAL_GROUP_1h_v2\\model.keras",
+  "scaler_file": "models\\GENERAL_GROUP_1h_v2\\scaler.pkl"
+}

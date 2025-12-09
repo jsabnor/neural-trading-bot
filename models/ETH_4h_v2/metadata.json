@@ -1,0 +1,14 @@
+{
+  "symbols": [
+    "ETH/USDT",
+    "SOL/USDT",
+    "XRP/USDT"
+  ],
+  "timeframe": "4h",
+  "description": "Model trained on ETH/USDT, SOL/USDT, XRP/USDT",
+  "accuracy": null,
+  "name": "ETH_4h_v2",
+  "saved_at": "2025-12-02T16:44:23.389367",
+  "model_file": "models\\ETH_4h_v2\\model.keras",
+  "scaler_file": "models\\ETH_4h_v2\\scaler.pkl"
+}

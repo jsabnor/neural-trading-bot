@@ -1,0 +1,44 @@
+{
+    "timestamp": "2025-12-09T17:00:38.033789",
+    "equity": {
+        "ETH/USDT": 50.0,
+        "SOL/USDT": 1.1353600000000057,
+        "DOGE/USDT": 50.0,
+        "ADA/USDT": 50.0,
+        "AVAX/USDT": 1.019599999999997,
+        "BNB/USDT": 50.0,
+        "LINK/USDT": 50.0,
+        "XRP/USDT": 49.62794000000001
+    },
+    "positions": {
+        "ETH/USDT": null,
+        "SOL/USDT": {
+            "type": "long",
+            "entry_price": 138.82,
+            "qty": 0.352,
+            "cost": 48.864639999999994,
+            "sl_price": 133.2672,
+            "tp_price": 149.9256,
+            "highest_price": 138.82,
+            "entry_time": "2025-12-09T17:00:38.033789",
+            "confidence": 0.565567135810852
+        },
+        "DOGE/USDT": null,
+        "ADA/USDT": null,
+        "AVAX/USDT": {
+            "type": "long",
+            "entry_price": 13.72,
+            "qty": 3.57,
+            "cost": 48.9804,
+            "sl_price": 13.1712,
+            "tp_price": 14.817600000000002,
+            "highest_price": 14.15,
+            "entry_time": "2025-12-09T05:03:02.180817",
+            "confidence": 0.5779110789299011
+        },
+        "BNB/USDT": null,
+        "LINK/USDT": null,
+        "XRP/USDT": null
+    },
+    "last_summary_date": null
+}
