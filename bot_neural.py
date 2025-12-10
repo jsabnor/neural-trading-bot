@@ -98,7 +98,14 @@ class NeuralBot:
         print(f"{'='*70}")
         print(f"Timeframe: {self.TIMEFRAME}")
         print(f"Pares: {len(self.SYMBOLS)}")
-        print(f"Modelo cargado: v{self.strategy.version if self.strategy.model else 'Ninguno'}")
+        if self.strategy.model_name:
+            model_display = self.strategy.model_name
+        elif self.strategy.version is not None:
+            model_display = f"v{self.strategy.version}"
+        else:
+            model_display = "Ninguno"
+            
+        print(f"Modelo cargado: {model_display}")
         print(f"Telegram: {'✓ Habilitado' if self.telegram.enabled else '✗ Deshabilitado'}")
         print(f"{'='*70}\n")
         
