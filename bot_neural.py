@@ -247,13 +247,21 @@ class NeuralBot:
             actual_price = price
             revenue = float(qty) * actual_price
             
-        # Calcular PnL
-        cost = pos['cost']
-        pnl = revenue - cost
-        pnl_percent = (pnl / cost) * 100
+        # Calcular Comisiones (Estimadas)
+        # Entry Fee (ya pagado al entrar, pero se resta del PnL Global) + Exit Fee (ahora)
+        entry_fee_est = cost * config.TRADING_FEE
+        exit_fee_est = revenue * config.TRADING_FEE
+        total_fees = entry_fee_est + exit_fee_est
         
-        # Actualizar equity
-        self.equity[symbol] += revenue
+        # Calcular PnL Neto
+        gross_pnl = revenue - cost
+        net_pnl = gross_pnl - total_fees
+        net_pnl_percent = (net_pnl / cost) * 100
+        
+        # Actualizar equity (restando comisiones de salida para ser realistas en el balance)
+        # Nota: En paper mode simulamos que el exchange se queda el fee de salida
+        self.equity[symbol] += (revenue - exit_fee_est)
+        
         self.positions[symbol] = None
         self.save_state()
         
@@ -266,17 +274,21 @@ class NeuralBot:
             'entry_price': pos['entry_price'],
             'exit_price': actual_price,
             'qty': qty,
-            'pnl': pnl,
-            'pnl_percent': pnl_percent,
+            'pnl': net_pnl,         # Backward compatibility (Neto)
+            'gross_pnl': gross_pnl,
+            'fees': total_fees,
+            'net_pnl': net_pnl,
+            'pnl_percent': net_pnl_percent, # Usamos el neto para estadísticas
             'duration': 'N/A' # TODO: Calcular duración
         })
         
-        print(f"✅ Venta completada. PnL: ${pnl:.2f} ({pnl_percent:.2f}%)")
+        print(f"✅ Venta completada. Net PnL: ${net_pnl:.2f} ({net_pnl_percent:.2f}%) [Fees: ${total_fees:.2f}]")
         
         # Notificar
         if self.telegram.enabled:
+            # Enviamos el neto para no engañarnos
             self.telegram.notify_sell(
-                symbol, actual_price, qty, revenue, pnl, pnl_percent, 
+                symbol, actual_price, qty, revenue, net_pnl, net_pnl_percent, 
                 reason, strategy_name="NEURAL"
             )
             

@@ -315,13 +315,23 @@ class TelegramBotHandler:
             
         # Estadísticas Generales
         total_pnl = closed_trades['pnl'].sum()
+        
+        # Calcular Gross y Fees si existen
+        total_fees = closed_trades['fees'].sum() if 'fees' in closed_trades.columns else 0.0
+        total_gross = closed_trades['gross_pnl'].sum() if 'gross_pnl' in closed_trades.columns else total_pnl
+        
         total_trades = len(closed_trades)
         wins = len(closed_trades[closed_trades['pnl'] > 0])
         win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
         
         text = f"<b>{label} - REPORTE DE RENDIMIENTO</b>\n"
         text += f"━━━━━━━━━━━━━━━━\n"
-        text += f"💰 <b>Beneficio Total: ${total_pnl:+.2f}</b>\n"
+        if total_fees > 0:
+             text += f"💰 <b>Bruto: ${total_gross:+.2f}</b>\n"
+             text += f"💸 <b>Fees: -${total_fees:.2f}</b>\n"
+             text += f"📉 <b>NETO: ${total_pnl:+.2f}</b>\n"
+        else:
+             text += f"💰 <b>Beneficio Total: ${total_pnl:+.2f}</b>\n"
         text += f"🔢 Operaciones: {total_trades}\n"
         text += f"🎯 Win Rate: {win_rate:.1f}%\n\n"
         

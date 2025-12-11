@@ -140,6 +140,7 @@ class NeuralConfig:
     USE_COMPOUNDING = True        # Reinvertir ganancias (True) o tamaño fijo (False)
     INITIAL_CAPITAL = 50.0        # Capital inicial por símbolo
     MAX_POSITION_SIZE = 10000.0   # Límite máximo de posición para evitar crecimiento irreal
+    TRADING_FEE = 0.001           # Comisión por trade (0.1% estándar, 0.075% con BNB)
     
     CLASS_LABELS = {
         0: 'NO_BUY',

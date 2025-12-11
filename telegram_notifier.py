@@ -149,7 +149,7 @@ class TelegramNotifier:
         
         self.send_message(text, buttons=buttons)
     
-    def notify_sell(self, symbol, price, qty, reason, pnl, roi, entry_price=None, duration=None, strategy_name=''):
+    def notify_sell(self, symbol, price, qty, reason, net_pnl, roi, gross_pnl=None, fees=None, entry_price=None, duration=None, strategy_name=''):
         """
         Notificación de venta mejorada.
         
@@ -158,8 +158,10 @@ class TelegramNotifier:
             price: Precio de venta
             qty: Cantidad vendida
             reason: Razón de la venta ('TP', 'SL', 'MA_SL', 'bearish')
-            pnl: Profit & Loss en USD
-            roi: Retorno sobre inversión en %
+            net_pnl: Profit & Loss NETO en USD
+            roi: Retorno sobre inversión NETO en %
+            gross_pnl: PnL Bruto (opcional)
+            fees: Comisiones pagadas (opcional)
             entry_price: Precio de entrada (opcional)
             duration: Duración del trade en formato string (opcional)
             strategy_name: Nombre de la estrategia (opcional)
@@ -182,7 +184,7 @@ class TelegramNotifier:
         
         emoji = emoji_map.get(reason, '📉')
         reason_text = reason_map.get(reason, reason)
-        profit = pnl > 0
+        profit = net_pnl > 0
         result_emoji = '🟢' if profit else '🔴'
         pnl_emoji = '💚' if profit else '💔'
         
@@ -218,10 +220,20 @@ class TelegramNotifier:
         
         text += f"""
 
-💰 <b>Resultado:</b>
-├─ P&L: <b>${pnl:+.2f}</b>
+💰 <b>Resultado:</b>"""
+        
+        if gross_pnl is not None and fees is not None:
+             text += f"""
+├─ PnL Bruto: ${gross_pnl:+.2f}
+├─ Fees: -${fees:.2f}
+└─ {pnl_emoji} <b>NETO: ${net_pnl:+.2f} ({roi:+.2f}%)</b>"""
+        else:
+             text += f"""
+├─ P&L: <b>${net_pnl:+.2f}</b>
 ├─ ROI: <b>{roi:+.2f}%</b>
-└─ {emoji} {reason_text}
+└─ {emoji} {reason_text}"""
+
+        text += f"""
 
 {pnl_emoji} {'¡Ganancia!' if profit else 'Pérdida'}
 

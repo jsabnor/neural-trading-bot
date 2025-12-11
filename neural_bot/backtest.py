@@ -253,9 +253,16 @@ class NeuralBacktest:
                 if should_close:
                     # Cerrar posición
                     exit_value = position['size'] * current_price
-                    invested = position['invested_capital']  # FIX: Usar capital invertido
-                    profit = exit_value - invested
-                    profit_pct = (exit_value / invested - 1)
+                    invested = position['invested_capital']
+                    
+                    # Calcular comisiones (Entrada + Salida)
+                    entry_fee = invested * config.TRADING_FEE
+                    exit_fee = exit_value * config.TRADING_FEE
+                    total_fees = entry_fee + exit_fee
+                    
+                    # Profit neto (Valor Salida - Valor Entrada - Comisiones)
+                    profit = exit_value - invested - total_fees
+                    profit_pct = (profit / invested)
                     
                     trade = {
                         'symbol': symbol,
@@ -264,7 +271,9 @@ class NeuralBacktest:
                         'entry_price': position['entry_price'],
                         'exit_price': current_price,
                         'size': position['size'],
-                        'profit': profit,
+                        'gross_pnl': exit_value - invested, # Bruto
+                        'fees': total_fees,                 # Comisiones
+                        'profit': profit,                   # Neto
                         'profit_pct': profit_pct,
                         'exit_reason': exit_reason,
                         'entry_confidence': position['confidence']
@@ -296,7 +305,9 @@ class NeuralBacktest:
         print(f"{'='*60}")
         print(f"Total Trades: {metrics['total_trades']}")
         print(f"Win Rate: {metrics['win_rate']:.2%}")
-        print(f"ROI: {metrics['roi']:.2%}")
+        print(f"ROI Bruto: {metrics['roi_gross']:.2%}")
+        print(f"Fees Pagadas: ${metrics['total_fees']:.2f}")
+        print(f"ROI Neto: {metrics['roi_net']:.2%}")
         print(f"Final Capital: ${metrics['final_capital']:.2f}")
         print(f"Max Drawdown: {metrics['max_drawdown']:.2%}")
         print(f"Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
@@ -332,9 +343,38 @@ class NeuralBacktest:
         
         win_rate = len(winning_trades) / len(trades) if trades else 0
         
-        # ROI
-        final_capital = equity_curve[-1]['equity'] if equity_curve else initial_capital
-        roi = (final_capital - initial_capital) / initial_capital
+        # Calcular Métricas Avanzadas
+        
+        # 1. Gross Profit (Antes de comisiones) & Fees
+        gross_profits = []
+        fees = []
+        
+        for t in trades:
+            # Reconstruir profit bruto si tenemos los datos (para compatibilidad)
+            if 'gross_pnl' in t:
+                gross_profits.append(t['gross_pnl'])
+                fees.append(t['fees'])
+            elif 'fees' in t:
+                # Si tenemos fees pero no gross explícito
+                fees.append(t['fees'])
+                gross_profits.append(t['profit'] + t['fees'])
+            else:
+                # Retrocompatibilidad (asumir todo es profit si no hay fees registradas)
+                gross_profits.append(t['profit'])
+                fees.append(0.0)
+                
+        total_gross_profit = sum(gross_profits)
+        total_fees = sum(fees)
+        total_net_profit = sum([t['profit'] for t in trades]) # Profit ya es neto en trades
+        
+        # 2. ROI Gross vs Net
+        # Calcular final capital teórico si no hubiéramos pagado fees
+        final_capital_gross = initial_capital + total_gross_profit
+        roi_gross = (final_capital_gross - initial_capital) / initial_capital
+        
+        # ROI Neto (Real)
+        final_capital_net = equity_curve[-1]['equity'] if equity_curve else initial_capital
+        roi_net = (final_capital_net - initial_capital) / initial_capital
         
         # Max Drawdown
         max_equity = initial_capital
@@ -354,7 +394,7 @@ class NeuralBacktest:
         if len(returns) > 0 and np.std(returns) > 0:
             sharpe_ratio = np.mean(returns) / np.std(returns) * np.sqrt(365 * 24 / 4)  # Anualizado para 4h
         
-        # Profit/Loss promedio
+        # Profit/Loss promedio (Neto)
         avg_profit = np.mean([t['profit'] for t in winning_trades]) if winning_trades else 0
         avg_loss = np.mean([t['profit'] for t in losing_trades]) if losing_trades else 0
         
@@ -363,8 +403,10 @@ class NeuralBacktest:
             'winning_trades': len(winning_trades),
             'losing_trades': len(losing_trades),
             'win_rate': win_rate,
-            'roi': roi,
-            'final_capital': final_capital,
+            'roi_gross': roi_gross, # NUEVO
+            'roi_net': roi_net,     # NUEVO (renombrado de roi)
+            'total_fees': total_fees, # NUEVO
+            'final_capital': final_capital_net,
             'max_drawdown': max_drawdown,
             'sharpe_ratio': sharpe_ratio,
             'avg_profit': avg_profit,
