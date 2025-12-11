@@ -97,6 +97,16 @@ class TelegramNotifier:
         
         # Construir mensaje
         symbol_clean = symbol.replace('/USDT', '')
+        # Asegurar tipos numéricos para formateo
+        try:
+            price = float(price)
+            qty = float(qty)
+            cost = float(cost)
+            sl_price = float(sl_price)
+            tp_price = float(tp_price)
+        except:
+            pass
+            
         text = f"""🟢 <b>{strategy_prefix}COMPRA EJECUTADA</b>
 
 ━━━━━━━━━━━━━━━━━━━━
