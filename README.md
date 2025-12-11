@@ -66,7 +66,7 @@ python telegram_bot_handler.py
 
 - [Guía de Instalación en VPS](docs/INSTALLATION_VPS.md)
 - [Guía de Comandos](docs/COMMANDS.md)
-- [Comparativa de Backtest](docs/BACKTEST_COMPARISON.md)
+- [Comparativa de Backtest](docs/BACKTEST_COMPARISON_2020-2025.md)
 
 ## 📊 Estructura
 
