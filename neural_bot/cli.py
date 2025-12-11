@@ -180,7 +180,8 @@ def cmd_backtest(args):
             args.symbol,
             strategy,
             start_date=args.start_date,
-            end_date=args.end_date
+            end_date=args.end_date,
+            timeframe=args.timeframe
         )
         print(f"\n✅ Backtest completado para {args.symbol}")
     else:
@@ -189,7 +190,8 @@ def cmd_backtest(args):
         results = backtester.backtest_multiple(
             symbols,
             start_date=args.start_date,
-            end_date=args.end_date
+            end_date=args.end_date,
+            timeframe=args.timeframe
         )
         print(f"\n✅ Backtest completado para {len(symbols)} símbolos")
 
@@ -241,6 +243,7 @@ def main():
     parser_backtest.add_argument('--start-date', help='Fecha inicial (YYYY-MM-DD)')
     parser_backtest.add_argument('--end-date', help='Fecha final (YYYY-MM-DD)')
     parser_backtest.add_argument('--capital', type=float, default=50, help='Capital por par (default: 50)')
+    parser_backtest.add_argument('--timeframe', help='Timeframe a usar (ej: 1h, 4h). Default: Config')
     parser_backtest.set_defaults(func=cmd_backtest)
     
     # Parse argumentos

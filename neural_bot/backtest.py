@@ -33,7 +33,7 @@ class NeuralBacktest:
         self.capital_per_pair = capital_per_pair
         self.cache = DataCache()
     
-    def backtest_symbol(self, symbol, strategy, start_date=None, end_date=None):
+    def backtest_symbol(self, symbol, strategy, start_date=None, end_date=None, timeframe=None):
         """
         Ejecuta backtest en un símbolo
         
@@ -42,17 +42,21 @@ class NeuralBacktest:
             strategy: Instancia de NeuralStrategy
             start_date: Fecha inicial (str formato YYYY-MM-DD)
             end_date: Fecha final (str formato YYYY-MM-DD)
+            timeframe: Timeframe opcional (default: Config)
         
         Returns:
             dict con métricas de rendimiento
         """
+        # Determinar timeframe
+        tf = timeframe or config.DEFAULT_TIMEFRAME
+        
         print(f"\n{'='*60}")
-        print(f"Backtesting {symbol}")
+        print(f"Backtesting {symbol} ({tf})")
         print(f"{'='*60}")
         
         # Cargar datos (con actualización si es necesario)
         print(f"📥 Verificando datos en cache...")
-        df = self.cache.get_data(symbol, config.DEFAULT_TIMEFRAME)
+        df = self.cache.get_data(symbol, tf)
         
         if df is None or len(df) < config.LOOKBACK_WINDOW:
             print(f"❌ Datos insuficientes para {symbol}")
@@ -80,7 +84,8 @@ class NeuralBacktest:
             print(f"⚠️ Solo {len(df)} velas después de filtrar (necesitas {config.LOOKBACK_WINDOW})")
             
             # Obtener la última fecha actual del cache
-            cache_df = self.cache.load_from_cache(symbol, config.DEFAULT_TIMEFRAME)
+            # Obtener la última fecha actual del cache
+            cache_df = self.cache.load_from_cache(symbol, tf)
             if cache_df is not None and len(cache_df) > 0:
                 last_date = cache_df['timestamp'].max()
                 print(f"📅 Última fecha en cache: {last_date}")
@@ -89,9 +94,22 @@ class NeuralBacktest:
                 from datetime import datetime
                 now = datetime.now()
                 hours_diff = (now - last_date).total_seconds() / 3600
-                updates_needed = int(hours_diff / 1000) + 2  # +2 de margen
                 
-                print(f"🔄 Actualizando cache hasta el presente ({updates_needed} actualizaciones estimadas)...")
+                # Ajustar estimación según timeframe
+                tf_hours = 4  # Default 4h
+                if tf.endswith('h'):
+                    try:
+                        tf_hours = int(tf[:-1])
+                    except:
+                        pass
+                elif tf.endswith('m'):
+                     tf_hours = int(tf[:-1]) / 60
+                elif tf.endswith('d'):
+                     tf_hours = int(tf[:-1]) * 24
+                     
+                updates_needed = int(hours_diff / (1000 * tf_hours)) + 2  # Aproximación
+                
+                print(f"🔄 Actualizando cache hasta el presente...")
             else:
                 print(f"🔄 Actualizando cache hasta el presente...")
                 updates_needed = 50  # Default si no podemos calcular
@@ -105,7 +123,7 @@ class NeuralBacktest:
                 updates_done += 1
                 
                 # Forzar actualización del cache (descarga desde último timestamp)
-                df_updated = self.cache.update_cache(symbol, config.DEFAULT_TIMEFRAME)
+                df_updated = self.cache.update_cache(symbol, tf)
                 
                 if df_updated is None:
                     print(f"   ⚠️ Error actualizando cache")
@@ -125,7 +143,7 @@ class NeuralBacktest:
                 previous_count = current_count
             
             # Recargar datos actualizados y aplicar filtros
-            df = self.cache.load_from_cache(symbol, config.DEFAULT_TIMEFRAME)
+            df = self.cache.load_from_cache(symbol, tf)
             if df is None:
                 print(f"❌ Error recargando cache")
                 return None
@@ -329,7 +347,9 @@ class NeuralBacktest:
                 'winning_trades': 0,
                 'losing_trades': 0,
                 'win_rate': 0,
-                'roi': 0,
+                'roi_gross': 0,
+                'roi_net': 0,
+                'total_fees': 0,
                 'final_capital': initial_capital,
                 'max_drawdown': 0,
                 'sharpe_ratio': 0,
@@ -413,7 +433,7 @@ class NeuralBacktest:
             'avg_loss': avg_loss
         }
     
-    def backtest_multiple(self, symbols, start_date=None, end_date=None):
+    def backtest_multiple(self, symbols, start_date=None, end_date=None, timeframe=None):
         """Backtest en múltiples símbolos"""
         
         # Cargar estrategia
@@ -422,7 +442,7 @@ class NeuralBacktest:
         results = []
         
         for symbol in symbols:
-            result = self.backtest_symbol(symbol, strategy, start_date, end_date)
+            result = self.backtest_symbol(symbol, strategy, start_date, end_date, timeframe)
             if result is not None:
                 results.append(result)
         
@@ -434,13 +454,14 @@ class NeuralBacktest:
             
             total_trades = sum(r['metrics']['total_trades'] for r in results)
             avg_win_rate = np.mean([r['metrics']['win_rate'] for r in results])
-            avg_roi = np.mean([r['metrics']['roi'] for r in results])
+            # avg_roi = np.mean([r['metrics']['roi'] for r in results]) # DEPRECATED
+            avg_roi_net = np.mean([r['metrics']['roi_net'] for r in results])
             avg_sharpe = np.mean([r['metrics']['sharpe_ratio'] for r in results])
-            
+
             print(f"Símbolos: {len(results)}")
             print(f"Total Trades: {total_trades}")
             print(f"Avg Win Rate: {avg_win_rate:.2%}")
-            print(f"Avg ROI: {avg_roi:.2%}")
+            print(f"Avg ROI Neto: {avg_roi_net:.2%}")
             print(f"Avg Sharpe: {avg_sharpe:.2f}")
             print(f"{'='*60}\n")
             
